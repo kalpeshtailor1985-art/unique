@@ -52,9 +52,10 @@ Teachers with no purchase see locked items and an "Unlock Rs 150" button for eac
 - Guest data is a **public copy of chapters 1-2 only** (`guestdemo` in the database), published by the admin with the catalog. The paid question bank stays private.
 
 ## Running line in the login window
-- Above the Sign In / Sign Up tabs a **continuous running line** scrolls the Standard + Subject pairs that really have questions, e.g. `📚 Std 12 Science · Mathematics (050) (120 Qs)`.
+- Above the Sign In / Sign Up tabs a **continuous running line** scrolls what the Question Bank really holds. First item: `📚 Total in Question Bank: 952 Questions`. Then one item per Standard + Subject, e.g. `📚 Std 12 Science · Mathematics (050) (120 Questions)`.
+- **The numbers are exact.** They are counted straight from the Question Bank (General + GUJCET + Previous Year questions together) when the admin publishes the catalog. The per-subject items always add up to the total; questions that have no Standard yet are shown as `Standard not set yet (N Questions)`, so nothing is missing.
 - Only pairs with questions are listed (empty ones are never shown). It pauses when the mouse is over it, and stops moving for people who set "reduce motion".
-- It is built from the public catalog, so it updates by itself when you add questions and publish (automatic, or UPI Payments -> Publish now). It stays hidden until the first publish.
+- It updates by itself about 15 seconds after the admin adds, edits, imports or deletes questions (or at once with UPI Payments -> **Publish now**). It stays hidden until the first publish. If a number ever looks old, sign in as admin and press **Publish now**.
 
 ## Coming Soon (reminder)
 - Empty Standard / Subject: padlock + COMING SOON badge in the drop-downs and My Subjects window; the Question Bank and the Blueprint matrix show a big "Coming Soon" card when you pick such a pair. It cannot be bought.
