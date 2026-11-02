@@ -106,3 +106,20 @@
   color: #fff;
   border-color: #1e3a8a;
 }
+/* === Running line (login window) === */
+.kt-ticker-track {
+  display: inline-block;
+  width: max-content;
+  white-space: nowrap;
+  padding: 6px 0;
+  animation: ktTicker 30s linear infinite;
+  will-change: transform;
+}
+@keyframes ktTicker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.kt-ticker-wrap:hover .kt-ticker-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .kt-ticker-track { animation: none; white-space: normal; width: auto; }
+}
