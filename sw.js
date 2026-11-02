@@ -2,12 +2,15 @@
    - Pre-caches every local file so the app opens offline.
    - Network-first for the app's own files: users always get the newest version when online.
    - BUMP CACHE_VERSION every time you deploy, so old caches are deleted. */
-const CACHE_VERSION = 'kt-maths-v15';
+const CACHE_VERSION = 'kt-maths-v16';
 const LOCAL_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './web_206.png',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png',
   './css/app.css',
   './css/print-paper.css',
   './js/state.js',
