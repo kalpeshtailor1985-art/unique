@@ -30,7 +30,7 @@ jobs:
       - name: Build site folder (website files only)
         run: |
           mkdir -p _site
-          for f in index.html manifest.json sw.js web_206.png check.html upi-qr.png; do
+          for f in index.html manifest.json sw.js web_206.png icon-192.png icon-512.png icon-maskable-512.png check.html upi-qr.png; do
             if [ -f "$f" ]; then cp "$f" _site/; else echo "::warning::$f not found in the repo (skipped)"; fi
           done
           for d in css js; do
