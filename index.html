@@ -14,10 +14,10 @@
   <meta name="apple-mobile-web-app-title" content="KT Maths Exam Suite">
   <meta name="description" content="Official GSEB Examination, GUJCET & Blueprint Suite - Kalpesh Tailor">
   <link rel="manifest" href="manifest.json">
-  <link id="app-favicon" rel="icon" type="image/png" sizes="192x192" href="web_206.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="web_206.png">
-  <link id="apple-touch-icon" rel="apple-touch-icon" sizes="192x192" href="web_206.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="web_206.png">
+  <link id="app-favicon" rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link id="apple-touch-icon" rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
 
   <script>
     /* KT Maths start-up check: shows a red bar if a file is missing / old on the website or a script crashes */
@@ -75,6 +75,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
+    window.tailwind = window.tailwind || {};   // keeps the page alive if the Tailwind CDN is blocked / offline
     tailwind.config = {
       darkMode: 'class',
       theme: {
@@ -90,7 +91,7 @@
     };
   </script>
 
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.460.0"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -143,14 +144,12 @@
         </div>
       </div>
 
-      <!-- Restored Running / Scrolling Ticker Line -->
-      <div id="gate-ticker" class="rounded-lg border border-amber-300 bg-amber-50 overflow-hidden">
+      <!-- Running line: filled by renderGateTicker() (js/catalog-guest.js) with the exact Question Bank counts -->
+      <div id="gate-ticker" class="hidden rounded-lg border border-amber-300 bg-amber-50 overflow-hidden" role="status" aria-label="Questions available in the Question Bank">
         <div class="flex items-center">
           <span class="shrink-0 px-2 py-1.5 bg-amber-500 text-white text-[10px] font-black uppercase tracking-wide">Question Bank</span>
           <div class="kt-ticker-wrap flex-1 overflow-hidden">
-            <marquee behavior="scroll" direction="left" scrollamount="4" class="text-[11px] font-semibold text-slate-800 py-1.5 block">
-              Std 12 Science · Mathematics (050) (952 Qs) &nbsp;&nbsp;&bull;&nbsp;&nbsp; Std 12 Science · Mathematics (050) (952 Qs)
-            </marquee>
+            <div id="gate-ticker-track" class="kt-ticker-track text-[11px] font-semibold text-slate-800"></div>
           </div>
         </div>
       </div>
