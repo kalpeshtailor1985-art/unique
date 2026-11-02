@@ -11,6 +11,7 @@ Teachers pay your UPI ID / QR, send you the UPI reference number (UTR), and you 
 | `css/app.css`, `css/print-paper.css`  | YES | Screen styles and the printed question-paper styles. |
 | `js/state.js`                         | YES | Settings (`SUB_CONFIG`, UPI ID, price), default data, storage helpers. |
 | `js/utils/media-math.js`              | YES | Images and maths (KaTeX / MathJax) helpers. |
+| `js/utils/word-question-parser.js`    | YES | Reads questions from Word (.docx) files for bulk import. |
 | `js/modules/blueprint-matrix.js`      | YES | Chapter x marks blueprint matrix and auto question picking. |
 | `js/modules/paper-workspace.js`       | YES | Paper preview, designer, PDF / Word / print export. |
 | `js/modules/gujcet-workspace.js`      | YES | GUJCET 40-MCQ workspace, question bank, bulk import. |
@@ -19,7 +20,8 @@ Teachers pay your UPI ID / QR, send you the UPI reference number (UTR), and you 
 | `js/access-migrate.js`                | YES | Admin one-time button: moves old data to Standard + Subject access. |
 | `js/catalog-guest.js`                 | YES | Coming Soon list (padlock + badge for empty Standard / Subject) and the Guest login (first two chapters). |
 | `js/init.js`                          | YES | Starts the app, KaTeX auto-render, image shrinker. LOADED LAST. |
-| `sw.js`, `manifest.json`, `web_206.png` | YES | Offline mode, auto-update, install icon. |
+| `sw.js`, `manifest.json`, `web_206.png` | YES | Offline mode, auto-update, app logo. |
+| `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` | YES | Real PNG install icons used by `manifest.json` (made from the logo). |
 | `upi-qr.png` (optional, you add it)   | YES | Your own printed QR picture, if you prefer it to the automatic QR. |
 | `.github/workflows/deploy-pages.yml`  | -   | Publishes ONLY the website files to GitHub Pages on every push. |
 | `database.rules.json`                 | no  | Firebase database security (who may read / write what). |
@@ -27,10 +29,10 @@ Teachers pay your UPI ID / QR, send you the UPI reference number (UTR), and you 
 | `.gitignore`                          | no  | Keeps private backups out of GitHub. |
 | `SECURITY.md`, `WORKFLOW.md`, `ACCESS.md` | no  | Security checklist, full workflow, and the Standard + Subject access rules with a test list. |
 
-Script order in `index.html` matters: state -> media-math -> blueprint-matrix -> paper-workspace -> gujcet-workspace -> app -> access-migrate -> catalog-guest -> secure-auth -> init.
+Script order in `index.html` matters: state -> media-math -> word-question-parser -> blueprint-matrix -> paper-workspace -> gujcet-workspace -> app -> access-migrate -> catalog-guest -> secure-auth -> init.
 
 ### Every release
-Open `sw.js` and change `CACHE_VERSION` (for example `kt-maths-v3` -> `kt-maths-v4`) before you push, so phones drop the old copy.
+Open `sw.js` and change `CACHE_VERSION` (for example `kt-maths-v16` -> `kt-maths-v17`) before you push, so phones drop the old copy.
 
 **New in this version:** running line of available subjects in the login window; guest is view-only (Question Bank + Blueprint, padlock after chapter 2, every button padlocked); empty Standard / Subject show a padlock + Coming Soon; the Guest login opens chapters 1-2 only (publish the rules, then UPI Payments -> Publish now).  each purchase opens ONE Standard + ONE Subject (see `ACCESS.md`; run the one-time upgrade button once). teachers need a verified Firebase account, and approving a payment asks for the last 4 characters of the UTR. Do the steps in `SECURITY.md` once (publish the NEW rules, lock the API key).
 
