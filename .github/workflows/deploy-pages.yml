@@ -1,0 +1,50 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build site folder (website files only)
+        run: |
+          mkdir -p _site
+          for f in index.html manifest.json sw.js web_206.png check.html upi-qr.png; do
+            if [ -f "$f" ]; then cp "$f" _site/; else echo "::warning::$f not found in the repo (skipped)"; fi
+          done
+          for d in css js; do
+            if [ -d "$d" ]; then cp -r "$d" _site/; else echo "::error::folder $d is missing from the repo"; exit 1; fi
+          done
+          [ -f _site/index.html ] || { echo "::error::index.html must be at the top level of the repo"; exit 1; }
+          touch _site/.nojekyll
+          echo "Files that will be published:"; find _site -type f | sort
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
