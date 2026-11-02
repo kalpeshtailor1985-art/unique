@@ -73,7 +73,18 @@ function buildCatalogData() {
     if (Object.keys(dq).length) demoQ[k] = dq;
     if (Object.keys(dr).length) demoR[k] = dr;
   });
+  // exact totals straight from the Question Bank, so the running line always matches it
+  const total = (state.questions || []).length;
+  const listed = Object.keys(catalog).reduce((sum, k) => sum + catalog[k].n, 0);
+  catalog._total = total;                                     // every question in the bank (General + GUJCET + Previous Year)
+  catalog._other = Math.max(0, total - listed);               // questions whose Standard / Subject is not set yet
   return { catalog, demoQ, demoR };
+}
+/* same text for the same data, whatever the key order (Firebase returns keys sorted) */
+function canonJson(v) {
+  if (Array.isArray(v)) return '[' + v.map(canonJson).join(',') + ']';
+  if (v && typeof v === 'object') return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canonJson(v[k])).join(',') + '}';
+  return JSON.stringify(v);
 }
 function quickSig(text) {
   let h = 5381; for (let i = 0; i < text.length; i++) h = ((h << 5) + h + text.charCodeAt(i)) | 0;
@@ -103,13 +114,18 @@ async function publishCatalog(manual) {
       if (s) sig[k] = s;
       if (s !== (old[k] || null)) { upd['guestdemo/q/' + k] = demoQ[k] || null; upd['guestdemo/r/' + k] = demoR[k] || null; changedKeys++; }
     });
-    const catChanged = catSig !== old._cat;
+    let liveSame = false;                                      // is the catalog in the database already exactly this?
+    if (state.catalog && state.catalog._published) {
+      const live = Object.assign({}, state.catalog); delete live._published;
+      liveSame = canonJson(live) === canonJson(JSON.parse(JSON.stringify(catalog)));
+    }
+    const catChanged = catSig !== old._cat || !liveSame;
     if (!catChanged && !changedKeys) { if (manual) alert('Catalog and guest preview are already up to date.'); return; }
     if (catChanged) { const out = Object.assign({}, catalog, { _published: Date.now() }); await firebaseDb.ref('catalog').set(out); state.catalog = out; }
     if (changedKeys) await firebaseDb.ref().update(upd);
     safeSet('KTM_CATALOG_SIG', sig);
     if (typeof refreshComingSoon === 'function') refreshComingSoon();
-    if (manual) alert(`Published.\n\nStandard + Subject pairs with questions: ${Object.keys(catalog).length}\nGuest preview updated for: ${changedKeys} pair(s)`);
+    if (manual) alert(`Published.\n\nQuestions in the bank: ${catalog._total}\nStandard + Subject pairs with questions: ${Object.keys(catalog).filter(k => k.charAt(0) !== '_').length}\nGuest preview updated for: ${changedKeys} pair(s)`);
   } catch (e) {
     if (manual) alert('Could not publish: ' + (e && e.message) + '\n\nCheck that the latest database.rules.json is published.');
     else console.warn('Catalog publish skipped:', e && e.message);
@@ -299,22 +315,30 @@ function appendGuestLockedChapters(container, stdVal, subVal, show) {
   });
 }
 
-/* ---------- login window: running line of what is available ---------- */
+/* ---------- login window: running line of what is available ----------
+   Every number comes from the public catalog the admin publishes, and the catalog is counted straight from the Question Bank:
+   the first item is the total of the whole bank, then one item per Standard + Subject. The items always add up to the total. */
 function renderGateTicker() {
   const box = document.getElementById('gate-ticker');
   const track = document.getElementById('gate-ticker-track');
   if (!box || !track) return;
   const cat = state.catalog;
   const items = [];
+  const qs = n => n + (n === 1 ? ' Question' : ' Questions');
   if (cat && cat._published) {
+    const pairs = [];
     Object.keys(GSEB_SUBJECTS).forEach(std => GSEB_SUBJECTS[std].forEach(sub => {
       const e = cat[keyOfPair(std, sub)];
-      if (e && e.n > 0) items.push(`${std} · ${sub} (${e.n} Qs)`);
+      if (e && e.n > 0) pairs.push(`${std} · ${sub} (${qs(e.n)})`);
     }));
+    const total = typeof cat._total === 'number' ? cat._total : pairs.length ? Object.keys(cat).reduce((a, k) => a + (cat[k] && cat[k].n > 0 ? cat[k].n : 0), 0) : 0;
+    if (total > 0) items.push(`Total in Question Bank: ${qs(total)}`);
+    pairs.forEach(t => items.push(t));
+    if (cat._other > 0) items.push(`Standard not set yet (${qs(cat._other)})`);
   }
   if (!items.length) { box.classList.add('hidden'); track.innerHTML = ''; return; }
   const one = items.map(t => `<span class="mx-5">📚 ${escapeHtml(t)}</span>`).join('');
   track.innerHTML = one + one;                                  // twice = seamless loop
-  track.style.animationDuration = Math.max(25, items.length * 5) + 's';
+  track.style.animationDuration = Math.max(25, items.length * 6) + 's';
   box.classList.remove('hidden');
 }
